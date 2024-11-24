@@ -37,14 +37,27 @@ const items = [
 
 const App = () => {
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  function handleClick(e) {
-    setData([...data, ...items.slice(data.length, data.length+10)]);
+  // Handle loading more items
+  const handleClick = (e) => {
+    e.persist();
+    if (loading) return; // Prevent multiple clicks while loading
+    setLoading(true);
 
-    if(data.length>=items.length-10) {
-      e.target.remove();
-    }
-  }
+    // Simulate asynchronous state update to avoid UI freeze
+    setTimeout(() => {
+      const nextItems = items.slice(data.length, data.length + 10);
+
+      setData((prevData) => [...prevData, ...nextItems]);
+      setLoading(false);
+
+      // Remove the button if all items are loaded
+      if (data.length + nextItems.length >= items.length) {
+        e.target.remove();
+      }
+    }, 300); // Simulated delay for loading
+  };
 
   return (
     <div>
@@ -59,7 +72,7 @@ const App = () => {
         })
       }
       </ul>
-      <button onClick={handleClick}>Load More</button>
+      <button onClick={handleClick}>{loading ? "Loading..." : "Load More"}</button>
     </div>
   )
 }
